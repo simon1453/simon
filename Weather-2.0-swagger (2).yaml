@@ -1,0 +1,130 @@
+openapi: "3.0.0"
+
+info:
+  version: '2.0'
+  title: API времени рассвета и заката
+  description: "Свободно распространяемое API, с помощью которого можно узнать время заката и рассвета по широте и долготе места."
+  contact:
+    name: API team
+    url: https://sunrise-sunset.org/contact
+
+servers:
+  - url: https://api.sunrise-sunset.org
+    description: Production server
+
+paths:
+  /json:
+    get:
+      summary: "получить время рассвета/заката"
+      description: "С помощью этого метода можно получить время рассвета и заката по широте и долготе места. Закат отличается от сумерек, которые делятся на три этапа, первый из которых — гражданские сумерки, которые начинаются, как только Солнце исчезло за горизонтом, и продолжаются, пока оно не опускается до 6 градусов ниже горизонта, второй этап — морские сумерки, между 6 и 12 градусов ниже горизонта; и третий — астрономические сумерки — это время, когда Солнце находится от 12 до 18 градусов ниже горизонта, и это самый темный момент сумерек. Ночь наступает, когда Солнце достигает 18 градусов ниже горизонта и больше не освещает небо."
+      operationId: getSunriseSunset
+      parameters:
+        - name: lat
+          in: query
+          description: "широта в градусах"
+          required: true
+          schema:
+            type: number
+            format: float
+          example: "37.3708698"
+
+        - name: lng
+          in: query
+          description: "долгота в градусах"
+          required: true
+          schema:
+            type: number
+            format: float
+          example: "-122.037593"
+
+        - name: date
+          in: query
+          description: "Дата в формате YYYY-MM-DD. Также принимает другие форматы даты. Если не указано, то по умолчанию считает для текущей даты."
+          required: false
+          schema:
+            type: string
+          example: "today"
+
+        - name: callback
+          in: query
+          description: "Callback function name for JSONP response. Optional."
+          required: false
+          schema:
+            type: string
+
+        - name: formatted
+          in: query
+          required: false
+          description: "0 или 1 (1 is default). Time values in response will be expressed following ISO 8601 and day_length will be expressed in seconds."
+          schema:
+            type: integer
+            format: int32
+          example: 1
+      responses:
+        200:
+          description: Ответ 200 от сервиса времени рассвета и заката
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SunriseSunsetResponse'
+components:
+  schemas:
+    SunriseSunsetResponse:
+      title: Response
+      type: object
+      properties:
+        results:
+          type: object
+          properties:
+            sunrise:
+              type: string
+              description: время рассвета
+              example: '7:27:02 AM'
+            sunset:
+              type: string
+              description: время заката
+              example: '5:05:55 PM'
+            solar_noon:
+              type: string
+              description: время когда солнце в зените
+              example: '12:16:28 PM'
+            day_length:
+              type: string
+              description: длина дня
+              example: '9:38:53'
+            civil_twilight_begin:
+              type: string
+              description: время, когда начинаются гражданские сумерки
+              example: '6:58:14 AM'
+            civil_twilight_end:
+              type: string
+              description: время, когда заканчиваются гражданские сумерки
+              example: '5:34:43 PM'
+            nautical_twilight_begin:
+              type: string
+              description: время, когда начинаются морские сумерки
+              example: '6:25:47 AM'
+            nautical_twilight_end:
+              type: string
+              description: время, когда заканчиваются морские сумерки
+              example: '6:07:10 PM'
+            astronomical_twilight_begin:
+              type: string
+              description: время, когда начинаются астрономические сумерки
+              example: '5:54:14 AM'
+            astronomical_twilight_end:
+              type: string
+              description: время, когда заканчиваются астрономические сумерки
+              example: '6:38:43 PM'
+        status:
+          type: string
+          description: "Four possible statuses:\n
+            \n* `OK`: No errors occurred.
+            \n* `INVALID_REQUEST`: Either lat or lng parameters are missing or invalid.
+            \n* `INVALID_DATE`: The date parameter is missing or invalid;
+            \n* `UNKNOWN_ERROR`: The request could not be processed due to a server error. The request may succeed if you try again."
+          example: "OK"
+
+externalDocs:
+  description: Documentation and main site
+  url: https://sunrise-sunset.org/api
